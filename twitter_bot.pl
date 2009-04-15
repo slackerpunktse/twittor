@@ -28,14 +28,19 @@ use IO::Socket;
 use URI::Escape;
 
 # configure variables
-my $ircserver = "irc.inet.tele.dk"; //add your irc network
-my $ircchannel = "#corporate"; //add your irc channel
-my $nickname = "``twitter"; //add your twitter bots nick
-my $username = "twittwittwit"; //add your twitter bots name
-my $twituser = ""; //add your twitter username
-my $twitpass= ""; //add your twitter password
+my $ircserver = "irc.inet.tele.dk";
 
-my $helpmessage = "I am the twitter update bot. I will update twitter for ".$ircchannel.". If you want to send an update just enter: !twitter <update text>. If you want to see all updates made - please visit twitter.com/".$twituser;
+my $ircchannel = "#slacker.se";
+my $nickname = "twittor";
+#my $ircchannel = "#status.slacker.se";
+#my $nickname = "achterr";
+
+my $username = "SSE";
+my $twituser = "slackerpunktse";
+my $twitpass= "";
+
+#my $helpmessage = "I am the twitter update bot. I will update twitter for ".$ircchannel.". If you want to send an update just enter: !update <update text>. If you want to see all updates made - please visit twitter.com/".$twituser;
+my $helpmessage = "jag aer cornholio!, ein twitterupdateringsbot. skriv 'twittor: hej!' och jag lovar att det hamnar haer: http://twitter.com/slackerpunktse";
 
 my $browser = LWP::UserAgent->new;
 
@@ -48,7 +53,7 @@ $sock = IO::Socket::INET->new(
 while($line = <$sock>){
         print $line;
         if($line =~ /(NOTICE AUTH).*(checking ident)/i){
-                print $sock "NICK $nickname\nUSER $username 0 0 :just a bot\n";
+                print $sock "NICK $nickname\nUSER $username 0 0 :twittrin\n";
                 last;
         }
 }
@@ -98,46 +103,59 @@ while ($line = <$sock>) {
         while($text =~ m#$/$#){ chomp($text); }
 	
 
-	if ($command =~ /TOPIC/){
-		my $topic_update = "Topic changed by $nick:  $text\n\n\n";
-		$topic_update =~ s/</[/g;
-        $topic_update =~ s/>/]/g;
-		my $topic_delurl = "http://" . $twituser . ":" . $twitpass ."\@twitter.com/statuses/update.xml?status=".$topic_update;
-		print $topic_delurl;
-		my $topic_response = $browser->post( $topic_delurl );
-		my $topic_responsetext = $topic_response->content;
-		print $topic_responsetext;
-		if ($topic_responsetext =~ /\<created_at\>/){
-			print $sock "PRIVMSG $ircchannel :* Twitter updated: ".$topic_update."\n";
-		}else{
-			print $sock "PRIVMSG $ircchannel :* Twitter update failed\n" ;
-		}
-		$topic_responsetext = "";
-		$topic_update = "";
-	}
+
+#	if ($command =~ /TOPIC/){
+#		my $topic_update = "Topic changed by $nick:  $text\n\n\n";
+#		$topic_update =~ s/</[/g;
+#        $topic_update =~ s/>/]/g;
+#		my $topic_delurl = "http://" . $twituser . ":" . $twitpass ."\@twitter.com/statuses/update.xml?status=".$topic_update;
+#		print $topic_delurl;
+#		my $topic_response = $browser->post( $topic_delurl );
+#		my $topic_responsetext = $topic_response->content;
+#		print $topic_responsetext;
+#		if ($topic_responsetext =~ /\<created_at\>/){
+#			#print $sock "PRIVMSG $ircchannel :* Twitter updated: ".$topic_update."\n";
+#		}else{
+#			print $sock "PRIVMSG $ircchannel :* Twitter update failed\n" ;
+#		}
+#		$topic_responsetext = "";
+#		$topic_update = "";
+#	}
 
         
         if($channel eq $ircchannel){
                 print "<$nick> $text\n";
-		if($text =~ /^!twitterhelp(.*)/){
-		print $sock "PRIVMSG $ircchannel :* ".$helpmessage."\n";
-		}
-                if($text =~ /^!twitter (.*)/){
-			my $update = "[".$nick."] ".$1;
-			$update =~ s/</[/g;
-            $update =~ s/>/]/g;
-			my $delurl = "http://" . $twituser . ":" . $twitpass ."\@twitter.com/statuses/update.xml?status=". urlencode($update);
-			my $response = $browser->post( $delurl );
-			my $responsetext = $response->content;
-			print $responsetext;
-			if ($responsetext =~ /\<created_at\>/){
-				print $sock "PRIVMSG $ircchannel :* Twitter updated: ".$update."\n";
-			}else{
-				print $sock "PRIVMSG $ircchannel :* Twitter update failed\n" ;
-			}
-			$responsetext = "";
-			$update = "";
-			
+				if($text =~ /^!twitterhelp(.*)/) {
+				  print $sock "PRIVMSG $ircchannel :* ".$helpmessage."\n";
+				}
+
+				# post an update
+				if ( ($text =~ /^twittor: (.*)/) or ($text =~  /^ACTION (.*)/) ){
+				  my $txt = $1;
+
+				  my $update = ""; 
+				  if ($text =~ /^ACTION /) {
+					# this clearly does not work.
+					$update = "* ".$nick." ".$txt;
+				  } else {
+					$update = "[".$nick."] ".$txt;
+				  }
+				  
+				  $update =~ s/</[/g;
+				  $update =~ s/>/]/g;
+				  my $delurl = "http://" . $twituser . ":" . $twitpass ."\@twitter.com/statuses/update.xml?status=". urlencode($update);
+				  print "URL: $delurl";
+				  my $response = $browser->post( $delurl );
+				  my $responsetext = $response->content;
+				  print $responsetext;
+				  if ($responsetext =~ /\<created_at\>/){
+					#print $sock "PRIVMSG $ircchannel :* Twitter updated: ".$update."\n";
+				  }else{
+					print $sock "PRIVMSG $ircchannel :* Twitter update failed\n" ;
+				  }
+				  $responsetext = "";
+				  $update = "";
+				  # end of post
                 }
         }
 }
