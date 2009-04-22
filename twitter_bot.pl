@@ -1,24 +1,21 @@
 #!/usr/bin/perl
 
+# -- stolen and appropriated at around lunchtime,
+# lives in #slacker.se and serves that channel's nefarious purposes --
+
+
 # Twitter IRC Bot
 # This bot is one way communication with twitter.
+# originally written by harper?
 
 # to use just edit the bot and change the twitter username and pass. 
 # then set it up in a channel
 
 # then to send an update type:
-# !twitter update text
-
-# an update will be sent right away. 
-
-# the bot will also send a twitter update on topic change. 
-
-# awesome
-# - harper
+# twittor: update text.
 
 # thanks to b0iler for his page "Bare Bones IRC Bot In Perl"
 # http://b0iler.eyeonsecurity.org/tutorials/ircperlbot.htm
-
 # this script is largely based upon his barebones framework
 
 use LWP::Simple;
@@ -39,7 +36,6 @@ my $username = "SSE";
 my $twituser = "slackerpunktse";
 my $twitpass= "";
 
-#my $helpmessage = "I am the twitter update bot. I will update twitter for ".$ircchannel.". If you want to send an update just enter: !update <update text>. If you want to see all updates made - please visit twitter.com/".$twituser;
 my $helpmessage = "jag aer cornholio!, ein twitterupdateringsbot. skriv 'twittor: hej!' och jag lovar att det hamnar haer: http://twitter.com/slackerpunktse";
 
 my $browser = LWP::UserAgent->new;
@@ -102,26 +98,6 @@ while ($line = <$sock>) {
         $/ = "\r\n";
         while($text =~ m#$/$#){ chomp($text); }
 	
-
-
-#	if ($command =~ /TOPIC/){
-#		my $topic_update = "Topic changed by $nick:  $text\n\n\n";
-#		$topic_update =~ s/</[/g;
-#        $topic_update =~ s/>/]/g;
-#		my $topic_delurl = "http://" . $twituser . ":" . $twitpass ."\@twitter.com/statuses/update.xml?status=".$topic_update;
-#		print $topic_delurl;
-#		my $topic_response = $browser->post( $topic_delurl );
-#		my $topic_responsetext = $topic_response->content;
-#		print $topic_responsetext;
-#		if ($topic_responsetext =~ /\<created_at\>/){
-#			#print $sock "PRIVMSG $ircchannel :* Twitter updated: ".$topic_update."\n";
-#		}else{
-#			print $sock "PRIVMSG $ircchannel :* Twitter update failed\n" ;
-#		}
-#		$topic_responsetext = "";
-#		$topic_update = "";
-#	}
-
         
         if($channel eq $ircchannel){
                 print "<$nick> $text\n";
