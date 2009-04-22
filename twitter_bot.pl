@@ -133,6 +133,12 @@ while ($line = <$sock>) {
 				  $update = "";
 				  # end of post
                 }
+				
+				# do not post an update, but do help moln out.
+				if ( ($nick == "moln") and ($text =~ /!twittor: (.*)/) ) {
+				  sleep(2); # simulate thought.
+				  print $sock "PRIVMSG $ircchannel :ja men kristina, visst menar du 'twittor: "+$1+"'?";
+				}
         }
 }
 
