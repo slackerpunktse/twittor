@@ -1,4 +1,7 @@
 retarded irc-bot for I-can't-believe-it's-not-live tweets, irc-style.
 
-fork'd from http://twitterircbot.googlecode.com/ at around lunch,
-superseded by 'hah' - http://github.com/slackerpunktse/hah
+fork'd from 'twitterircbot' [0] at around lunch,
+superseded by 'hah' [1] a bit later in the evening.
+
+[0]: http://twitterircbot.googlecode.com/
+[1]: http://github.com/slackerpunktse/hah
